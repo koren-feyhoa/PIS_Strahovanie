@@ -1,9 +1,9 @@
 from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, Float, Date
 from sqlalchemy.orm import Mapped
 from sqlalchemy.orm import mapped_column
-from sqlalchemy.orm import sessionmaker, declarative_base
+from database import Base
 
-Base = declarative_base()
+
 class Client(Base):
     __tablename__='client'
     id=Column(Integer,primary_key=True)
