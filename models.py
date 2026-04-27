@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, Float, Date
+from sqlalchemy import Column, Integer, String, ForeignKey,JSON, DateTime, Float, Date
 from sqlalchemy.orm import Mapped
 from sqlalchemy.orm import mapped_column
 from database import Base
@@ -12,6 +12,9 @@ class Client(Base):
     email=Column(String(50), unique=True)
     password=Column(String)
 
+    def __repr__(self) -> str:
+        return f"Client(id={self.id}, fullname={self.fullname}, email={self.email})"
+
 class Agent(Base):
     __tablename__ = 'agent'
     id = Column(Integer, primary_key=True)
@@ -22,7 +25,8 @@ class Profile(Base):
     __tablename__ = 'profile'
     id:Mapped[int] = mapped_column(primary_key=True)
     client_id:Mapped[int] = mapped_column(ForeignKey('client.id'))
-    insurance_type:Mapped[str] = mapped_column(String(30))
+    type_document=Column(String)
+    info=Column(JSON)
 
 class Application(Base):
     __tablename__='application'
@@ -34,6 +38,10 @@ class Application(Base):
     profile_id=Column(ForeignKey('profile.id'))
     status_application=Column(String())
     calculate_price=Column(Float())
+    def __repr__(self) -> str:
+        return f"Application(id={self.id},status_application={self.status_application})"
+
+
 
 class Contract(Base):
     __tablename__ = 'contract'
