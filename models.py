@@ -1,3 +1,5 @@
+from typing import Optional
+
 from sqlalchemy import Column, Integer, String, ForeignKey,JSON, DateTime, Float, Date
 from sqlalchemy.orm import Mapped
 from sqlalchemy.orm import mapped_column
@@ -37,7 +39,7 @@ class Application(Base):
     data_create=Column(DateTime)
     profile_id=Column(ForeignKey('profile.id'))
     status_application=Column(String())
-    calculate_price=Column(Float())
+    calculate_price:[Optional[float]]=mapped_column(Float())
     def __repr__(self) -> str:
         return f"Application(id={self.id},status_application={self.status_application})"
 

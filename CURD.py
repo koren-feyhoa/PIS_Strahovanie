@@ -34,10 +34,36 @@ def getAllUserApplication(db:Session, client_id:int):
 def updateStatusApplication(db:Session,application_id:int,status:str):
     application=db.query(Application).filter(Application.id==application_id).first()
     if (application!=None):
-        print(application.status_application,application.id)
         application.status_application=status
         db.commit()
-        print(application.status_application, application.id)
+def getUserApplication(db:Session,client_id:int):
+    applicationsUser=db.query(Application).filter(Application.id==client_id).all()
+    return applicationsUser
+
+def updateClientName(db:Session,client_id:int, newName:str):
+    client=db.query(Client).filter(Client.id==client_id).first()
+    if (client!=None):
+        client.fullname=newName
+        db.commit()
+def updateClientEmail(db:Session,client_id:int, newEmail:str):
+    client=db.query(Client).filter(Client.id==client_id).first()
+    if (client!=None):
+        client.email=newEmail
+        db.commit()
+def updateProfile(db:Session,profile_id:int,newInfo:json):
+    profile = db.query(Profile).filter(Profile.id == profile_id).first()
+    if (profile!=None):
+        profile.info==newInfo
+        db.commit()
+
+def deleteProfile(db:Session,profile_id:int):
+    profile=db.query(Profile).filter(Profile.id==profile_id).first()
+    db.delete(profile)
+    db.commit()
+
+
+
+
 
 
 
