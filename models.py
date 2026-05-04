@@ -1,5 +1,9 @@
+import uuid
+from datetime import datetime
 from typing import Optional
 
+from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy.sql import func
 from sqlalchemy import Column, Integer, String, ForeignKey,JSON, DateTime, Float, Date
 from sqlalchemy.orm import Mapped
 from sqlalchemy.orm import mapped_column
@@ -54,5 +58,6 @@ class Contract(Base):
     contractNumber=Column(String)
     start_date=Column(Date())
     end_date=Column(Date())
-    file_name=Column(String())
-    file_path=Column(String())
+    file_name:[Optional[str]]=mapped_column(String())
+    file_path:[Optional[str]]=mapped_column(String())
+    file_time=Column(DateTime, nullable=True)
