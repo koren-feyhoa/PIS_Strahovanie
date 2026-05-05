@@ -61,3 +61,4 @@ class Contract(Base):
     file_name:[Optional[str]]=mapped_column(String())
     file_path:[Optional[str]]=mapped_column(String())
     file_time=Column(DateTime, nullable=True)
+    status_contract=Column(String())

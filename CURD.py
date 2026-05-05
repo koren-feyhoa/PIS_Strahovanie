@@ -2,7 +2,7 @@ import json
 from xmlrpc.client import DateTime
 
 from sqlalchemy.orm import Session
-from models import Client, Application, Profile
+from models import Client, Application, Profile, Contract
 
 
 def createClient(db:Session,name:str,phone:str,email:str,password:str):
@@ -60,6 +60,14 @@ def deleteProfile(db:Session,profile_id:int):
     profile=db.query(Profile).filter(Profile.id==profile_id).first()
     db.delete(profile)
     db.commit()
+
+def createContract(db:Session, application: Application,):
+    contract=Contract(client_id=application.client_id,
+                      application_id=application.id,
+                      agent_id=application.agent_id)
+    db.add(contract)
+    db.commit()
+
 
 
 
