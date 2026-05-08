@@ -36,29 +36,29 @@ class Profile(Base):
 
 class Application(Base):
     __tablename__='application'
-    id=Column(Integer,primary_key=True)
-    client_id:Mapped[int] = mapped_column(ForeignKey('client.id'))
-    agent_id=Column(ForeignKey('agent.id'))
+    id: Mapped[int] = mapped_column(primary_key=True)
+    client_id: Mapped[int] = mapped_column(ForeignKey('client.id'))
+    agent_id: Mapped[int] = mapped_column(ForeignKey('agent.id'))
     insurance_type: Mapped[str] = mapped_column(String(30))
-    data_create=Column(DateTime)
-    profile_id=Column(ForeignKey('profile.id'))
-    status_application=Column(String())
-    calculate_price:[Optional[float]]=mapped_column(Float())
-    def __repr__(self) -> str:
+    data_create: Mapped[DateTime] = mapped_column(DateTime)
+    profile_id: Mapped[int] = mapped_column(ForeignKey('profile.id'))
+    status_application: Mapped[str] = mapped_column(String(20))
+    calculate_price: Mapped[Optional[float]] = mapped_column(Float(), nullable=True)
+def __repr__(self) -> str:
         return f"Application(id={self.id},status_application={self.status_application})"
 
 
 
 class Contract(Base):
     __tablename__ = 'contract'
-    id = Column(Integer, primary_key=True)
+    id: Mapped[int] = mapped_column(primary_key=True)
     client_id: Mapped[int] = mapped_column(ForeignKey('client.id'))
-    application_id=Column(Integer, ForeignKey('application.id'))
-    agent_id = Column(ForeignKey('agent.id'))
-    contractNumber=Column(String)
-    start_date=Column(Date())
-    end_date=Column(Date())
-    file_name:[Optional[str]]=mapped_column(String())
-    file_path:[Optional[str]]=mapped_column(String())
-    file_time=Column(DateTime, nullable=True)
-    status_contract=Column(String())
+    application_id: Mapped[int] = mapped_column(ForeignKey('application.id'))
+    agent_id: Mapped[int] = mapped_column(ForeignKey('agent.id'))
+    contractNumber: Mapped[str] = mapped_column(String)
+    start_date: Mapped[Date] = mapped_column(Date)
+    end_date: Mapped[Date] = mapped_column(Date)
+    file_name: Mapped[Optional[str]] = mapped_column(String, nullable=True)
+    file_path: Mapped[Optional[str]] = mapped_column(String, nullable=True)
+    file_time: Mapped[Optional[DateTime]] = mapped_column(DateTime, nullable=True)
+    status_contract: Mapped[str] = mapped_column(String)

@@ -1,9 +1,13 @@
 import json
+from datetime import datetime
 from xmlrpc.client import DateTime
-
+import FileWork
+from psycopg2 import Date
 from sqlalchemy.orm import Session
-from models import Client, Application, Profile, Contract
 
+
+from models import Client, Application, Profile, Contract
+import pathlib
 
 def createClient(db:Session,name:str,phone:str,email:str,password:str):
     newClient=Client(fullname=name,phone=phone,email=email,password=password)
@@ -61,12 +65,47 @@ def deleteProfile(db:Session,profile_id:int):
     db.delete(profile)
     db.commit()
 
-def createContract(db:Session, application: Application,):
-    contract=Contract(client_id=application.client_id,
-                      application_id=application.id,
-                      agent_id=application.agent_id)
+def createContract(
+    db: Session,
+    application: Application,
+    contract_number: int,
+    date_start,  # используйте datetime.date или datetime.datetime
+    date_end,
+    file_path: pathlib.Path
+) -> Contract:
+    """Создаёт контракт и сохраняет информацию о файле."""
+    contract = Contract(
+        client_id=application.client_id,
+        application_id=application.id,
+        agent_id=application.agent_id,
+        contract_number=contract_number,
+        date_start=date_start,
+        date_end=date_end,
+        file_path=file_path.parent.as_posix(),   # папка (например "files/123")
+        file_name=file_path.name,                # имя файла (например "c8e9...pdf")
+        file_time=datetime.now()
+    )
     db.add(contract)
     db.commit()
+    db.refresh(contract)
+    return contract
+
+def getAllContracts(db:Session,agent_id:int):
+    allContracts=db.query(Contract).filter(Contract.agent_id==agent_id).list()
+    return allContracts
+
+def getContractsByClient(db:Session, client_id:int):
+    contracts=db.query(Contract).filter(Contract.client_id==client_id).list()
+    return contracts
+
+def getContractById(db:Session,contract_id:int):
+    contract=db.query(Contract).filter(Contract.id==contract_id).fitst()
+    return contract
+
+
+
+
+
 
 
 
