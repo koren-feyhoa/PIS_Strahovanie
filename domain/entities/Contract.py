@@ -34,7 +34,6 @@ class ContractEntity:
                file_time: Optional[datetime] = None,
                status: str = "Посмотреть") -> "ContractEntity":
         return cls(
-            id=None,
             client_id=client_id,
             application_id=application_id,
             agent_id=agent_id,

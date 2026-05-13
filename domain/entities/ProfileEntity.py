@@ -4,7 +4,7 @@ from typing import Optional, Any, Dict
 
 @dataclass
 class ProfileEntity:
-    id: int
+    id[Optional]: int
     client_id: int
     type_document: str
     info: Dict[str, Any]  # JSON-поле
@@ -16,6 +16,6 @@ class ProfileEntity:
             raise ValueError("info должно быть словарём")
 
     @classmethod
-    def create(cls,id:int, client_id: int, type_document: str, info: Dict[str, Any]) -> "ProfileEntity":
-        return cls(id=id, client_id=client_id, type_document=type_document, info=info)
+    def create(cls, client_id: int, type_document: str, info: Dict[str, Any]) -> "ProfileEntity":
+        return cls(client_id=client_id, type_document=type_document, info=info)
 

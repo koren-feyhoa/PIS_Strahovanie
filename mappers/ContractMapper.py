@@ -1,10 +1,9 @@
-# mappers.py
+# ContractMapper.py
 from domain.entities.Contract import ContractEntity
 from models import Contract as ContractORM  # ваша SQLAlchemy модель
 
 def contract_orm_to_entity(orm: ContractORM) -> ContractEntity:
     return ContractEntity(
-        id=orm.id,
         client_id=orm.client_id,
         application_id=orm.application_id,
         agent_id=orm.agent_id,
@@ -19,7 +18,6 @@ def contract_orm_to_entity(orm: ContractORM) -> ContractEntity:
 
 def contract_entity_to_orm(entity: ContractEntity) -> ContractORM:
     return ContractORM(
-        id=entity.id,
         client_id=entity.client_id,
         application_id=entity.application_id,
         agent_id=entity.agent_id,

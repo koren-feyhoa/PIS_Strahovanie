@@ -29,7 +29,7 @@ class Agent(Base):
 
 class Profile(Base):
     __tablename__ = 'profile'
-    id:Mapped[int] = mapped_column(primary_key=True)
+    id:Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     client_id:Mapped[int] = mapped_column(ForeignKey('client.id'))
     type_document=Column(String)
     info=Column(JSON)

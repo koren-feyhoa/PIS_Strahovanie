@@ -60,6 +60,10 @@ def updateProfile(db:Session,profile_id:int,newInfo:json):
         profile.info==newInfo
         db.commit()
 
+def readProdileById(db:Session,profile_id:int):
+    profile=db.query(Profile).filter(Profile.id==profile_id).first()
+    return profile
+
 def deleteProfile(db:Session,profile_id:int):
     profile=db.query(Profile).filter(Profile.id==profile_id).first()
     db.delete(profile)
@@ -91,15 +95,15 @@ def createContract(
     return contract
 
 def getAllContracts(db:Session,agent_id:int):
-    allContracts=db.query(Contract).filter(Contract.agent_id==agent_id).list()
+    allContracts=db.query(Contract).filter(Contract.agent_id==agent_id).all()
     return allContracts
 
 def getContractsByClient(db:Session, client_id:int):
-    contracts=db.query(Contract).filter(Contract.client_id==client_id).list()
+    contracts=db.query(Contract).filter(Contract.client_id==client_id).all()
     return contracts
 
 def getContractById(db:Session,contract_id:int):
-    contract=db.query(Contract).filter(Contract.id==contract_id).fitst()
+    contract=db.query(Contract).filter(Contract.id==contract_id).all()
     return contract
 
 
