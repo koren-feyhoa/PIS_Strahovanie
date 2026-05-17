@@ -12,8 +12,10 @@ class ProfileEntity:
     def __post_init__(self):
         if not self.type_document:
             raise ValueError("Тип документа не указан")
-        if not isinstance(self.info, dict):
-            raise ValueError("info должно быть словарём")
+        if self.type_document not in ['ОСАГО', 'Паспорт РФ', 'Водительские права', 'Машина', 'ВетПаспорт']:
+            raise ValueError("Тип документа должен быть из списка: 'ОСАГО', 'Паспорт РФ', 'Водительские права', 'Машина', 'ВетПаспорт'")
+        if not self.info:
+            raise ValueError("Заполните все поля")
 
     @classmethod
     def create(cls, client_id: int, type_document: str, info: Dict[str, Any]) -> "ProfileEntity":

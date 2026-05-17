@@ -3,10 +3,13 @@ from dataclasses import dataclass, field
 from datetime import date, datetime
 from typing import Optional, Any, Dict
 
+import phonenumbers
+
+
 # ------ Client ------
 @dataclass
 class ClientEntity:
-    id: int
+    id[Optional]: int
     fullname: str
     phone: str
     email: str
@@ -17,13 +20,17 @@ class ClientEntity:
             raise ValueError("ФИО не может быть пустым")
         if '@' not in self.email:
             raise ValueError("Некорректный email")
-        if len(self.phone) < 10:
-            raise ValueError("Номер телефона слишком короткий")
+        try:
+            parsed = phonenumbers.parse(self.phone, None)  # None = определить страну автоматически
+            if not phonenumbers.is_valid_number(parsed):
+                raise ValueError("Введите корректный номер телефона")
+        except phonenumbers.NumberParseException:
+            raise ValueError("Неверный формат номера телефона")
+
 
     @classmethod
-    def create(cls,id:int, fullname: str, phone: str, email: str, password: str) -> "ClientEntity":
+    def create(cls, fullname: str, phone: str, email: str, password: str) -> "ClientEntity":
         return cls(
-            id=id,
             fullname=fullname,
             phone=phone,
             email=email,

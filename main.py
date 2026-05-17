@@ -10,15 +10,14 @@ from sqlalchemy.orm import Session
 from database import SessionLocal
 import CURD
 import models
+from domain.repositories.sqlalchemy_client_repo import SQLAlchemyClientRepository
 from domain.repositories.sqlalchemy_contract_repo import SQLAlchemyContractRepository
 from domain.repositories.sqlalchemy_profile_repo import SQLAlchemyProfileRepository
-from domain.entities.ContractEntity import ContractEntity
-from domain.entities.ProfileEntity import ProfileEntity
+
+from domain.services.ClientService import ClientServise
 from domain.services.ContractService import ContractService
 from domain.services.ProfileService import ProfileService
-from mappers.ContractMapper import contract_entity_to_orm
-from mappers.ProfileMapper import profile_entity_to_orm
-from storage import FileStorage
+
 from fastapi.responses import FileResponse
 
 def update_expired_contracts_status():
@@ -65,8 +64,16 @@ def get_db():
 def test():
     return {"message": "ok"}
 @app.post("/client/")
-def createClient(name:str,phone:str,email:str,password:str, db: Session = Depends(get_db)):
-    return CURD.createClient(db, name, phone, email, password)
+async def createClient(fullname:str,phone:str,email:str,password:str, db: Session = Depends(get_db)):
+    repo=SQLAlchemyClientRepository(db)
+    service=ClientServise(repo)
+    result=await service.create_client(
+        fullname=fullname,
+        phone=phone,
+        email=email,
+        password=password
+    )
+    return result
 
 @app.post("/client/newApplication")
 def createApplication(client_id:int, agent_id:int,insurance_type:str, data_create:datetime,  profile_id:int, status_application:str,calculate_price:float , db:Session=Depends(get_db)):

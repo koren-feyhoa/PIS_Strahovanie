@@ -20,6 +20,9 @@ class ContractEntity:
             raise ValueError("Дата начала должна быть раньше даты окончания")
         if not self.contract_number or not self.contract_number.strip():
             raise ValueError("Номер договора не может быть пустым")
+        if not self.file_name or not self.file_path or not self.file_time:
+            raise ValueError("Файл не загружен")
+
 
     @classmethod
     def create(cls,
