@@ -1,5 +1,5 @@
 # ContractMapper.py
-from domain.entities.Contract import ContractEntity
+from domain.entities.ContractEntity import ContractEntity
 from models import Contract as ContractORM  # ваша SQLAlchemy модель
 
 def contract_orm_to_entity(orm: ContractORM) -> ContractEntity:

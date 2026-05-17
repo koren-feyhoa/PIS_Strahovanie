@@ -10,8 +10,12 @@ from sqlalchemy.orm import Session
 from database import SessionLocal
 import CURD
 import models
-from domain.entities.Contract import ContractEntity
+from domain.repositories.sqlalchemy_contract_repo import SQLAlchemyContractRepository
+from domain.repositories.sqlalchemy_profile_repo import SQLAlchemyProfileRepository
+from domain.entities.ContractEntity import ContractEntity
 from domain.entities.ProfileEntity import ProfileEntity
+from domain.services.ContractService import ContractService
+from domain.services.ProfileService import ProfileService
 from mappers.ContractMapper import contract_entity_to_orm
 from mappers.ProfileMapper import profile_entity_to_orm
 from storage import FileStorage
@@ -56,7 +60,6 @@ def get_db():
         yield db
     finally:
         db.close()
-print("!!! NEW VERSION OF main.py LOADED !!!")
 
 @app.get("/test_route")
 def test():
@@ -84,30 +87,19 @@ async def create_contract(
     db: Session = Depends(get_db),
     file: UploadFile = File(...),
 ):
-    folder_path, file_name = await FileStorage.save(file, client_id)
-    file_time = datetime.now()
-
-    contract_entity = ContractEntity.create(
+    repo=SQLAlchemyContractRepository(db)
+    service=ContractService(repo)
+    result = await service.create_contract(
         client_id=client_id,
         application_id=application_id,
         agent_id=agent_id,
         contract_number=contract_number,
         start_date=start_date,
         end_date=end_date,
-        file_name=file_name,
-        file_path=folder_path,
-        file_time=file_time,
-        status="Посмотреть"
+        file_upload=file,
     )
+    return result
 
-    db_contract = contract_entity_to_orm(contract_entity)
-    db.add(db_contract)
-    db.commit()
-    db.refresh(db_contract)
-
-    contract_entity.id = db_contract.id
-
-    return contract_entity
 
 @app.get("/contracts/contract")
 async def getContract(contract_id:int,client_id:int,db: Session = Depends(get_db)):
@@ -128,13 +120,10 @@ async def getContractsByClient(client_id:int,db: Session = Depends(get_db)):
 
 @app.post("/client/application/profiles")
 async def createProfile(client_id:int,type_document:str,info:Dict[str,str],db: Session = Depends(get_db)):
-    profile_entity=ProfileEntity.create(client_id,type_document,info)
-    db_profile=profile_entity_to_orm(profile_entity)
-    db.add(db_profile)
-    db.commit()
-    db.refresh(db_profile)
-    profile_entity.id=db_profile.id
-    return profile_entity
+    repo=SQLAlchemyProfileRepository(db)
+    service=ProfileService(repo)
+    result= await service.create_profile(client_id, type_document, info)
+    return result
 
 @app.get("/client/application/see_info")
 async def getProfileById(id:int,db: Session = Depends(get_db)):
