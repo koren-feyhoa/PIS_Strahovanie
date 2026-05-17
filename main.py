@@ -10,9 +10,11 @@ from sqlalchemy.orm import Session
 from database import SessionLocal
 import CURD
 import models
+from domain.repositories.sqlalchemy_application_repo import SQLAlchemyApplicationRepository
 from domain.repositories.sqlalchemy_client_repo import SQLAlchemyClientRepository
 from domain.repositories.sqlalchemy_contract_repo import SQLAlchemyContractRepository
 from domain.repositories.sqlalchemy_profile_repo import SQLAlchemyProfileRepository
+from domain.services.ApplicationService import ApplicationServise
 
 from domain.services.ClientService import ClientServise
 from domain.services.ContractService import ContractService
@@ -76,8 +78,17 @@ async def createClient(fullname:str,phone:str,email:str,password:str, db: Sessio
     return result
 
 @app.post("/client/newApplication")
-def createApplication(client_id:int, agent_id:int,insurance_type:str, data_create:datetime,  profile_id:int, status_application:str,calculate_price:float , db:Session=Depends(get_db)):
-    return CURD.createApplication(db,client_id,agent_id,insurance_type,data_create,profile_id,status_application,calculate_price)
+async def createApplication(client_id:int, agent_id:int,insurance_type:str,  profile_id:int , db:Session=Depends(get_db)):
+    repo=SQLAlchemyApplicationRepository(db)
+    service=ApplicationServise(repo)
+    result=await service.create_application(
+        client_id=client_id,
+        agent_id=agent_id,
+        insurance_type=insurance_type,
+        profile_id=profile_id,
+
+    )
+    return result
 
 @app.get("/client/myApplications")
 def getAllUserApplication(id_client: int, db:Session=Depends(get_db)):

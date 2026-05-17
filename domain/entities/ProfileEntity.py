@@ -12,7 +12,7 @@ class ProfileEntity:
     def __post_init__(self):
         if not self.type_document:
             raise ValueError("Тип документа не указан")
-        if self.type_document not in ['ОСАГО', 'Паспорт РФ', 'Водительские права', 'Машина', 'ВетПаспорт']:
+        if self.type_document not in ['Паспорт РФ', 'Водительские права', 'Машина', 'ВетПаспорт']:
             raise ValueError("Тип документа должен быть из списка: 'ОСАГО', 'Паспорт РФ', 'Водительские права', 'Машина', 'ВетПаспорт'")
         if not self.info:
             raise ValueError("Заполните все поля")

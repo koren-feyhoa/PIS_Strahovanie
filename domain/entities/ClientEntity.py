@@ -13,7 +13,7 @@ class ClientEntity:
     fullname: str
     phone: str
     email: str
-    password: str  # храним хеш, а не пароль открытым текстом
+    password: str
 
     def __post_init__(self):
         if not self.fullname:
