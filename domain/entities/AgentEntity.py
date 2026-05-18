@@ -4,9 +4,10 @@ from typing import Optional, Any, Dict
 # ------ Agent ------
 @dataclass
 class AgentEntity:
-    id: Optional[int]
+
     fullname: str
     email: str
+    id: Optional[int] = None
 
     def __post_init__(self):
         if not self.fullname:

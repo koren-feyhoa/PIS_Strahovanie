@@ -3,7 +3,7 @@ from datetime import date, datetime
 from typing import Optional, Any, Dict
 @dataclass
 class ContractEntity:
-    id[Optional]: int
+
     client_id: int
     application_id: int
     agent_id: int
@@ -14,12 +14,13 @@ class ContractEntity:
     file_path: Optional[str]
     file_time: Optional[datetime]
     status_contract: str
+    id: Optional[int] = None
 
     def __post_init__(self):
-        if self.start_date >= self.end_date:
-            raise ValueError("Дата начала должна быть раньше даты окончания")
         if not self.contract_number or not self.contract_number.strip():
             raise ValueError("Номер договора не может быть пустым")
+        if self.start_date >= self.end_date:
+            raise ValueError("Дата начала должна быть раньше даты окончания")
         if not self.file_name or not self.file_path or not self.file_time:
             raise ValueError("Файл не загружен")
 

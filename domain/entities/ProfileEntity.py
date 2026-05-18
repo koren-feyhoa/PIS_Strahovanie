@@ -4,10 +4,11 @@ from typing import Optional, Any, Dict
 
 @dataclass
 class ProfileEntity:
-    id[Optional]: int
+
     client_id: int
     type_document: str
     info: Dict[str, Any]  # JSON-поле
+    id: Optional[int] = None
 
     def __post_init__(self):
         if not self.type_document:

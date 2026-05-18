@@ -2,23 +2,25 @@
 from dataclasses import dataclass, field
 from datetime import date, datetime
 from typing import Optional, Any, Dict
-
+import re
 import phonenumbers
 
 
 # ------ Client ------
 @dataclass
 class ClientEntity:
-    id[Optional]: int
+
     fullname: str
     phone: str
     email: str
     password: str
+    id: Optional[int] = None
 
     def __post_init__(self):
         if not self.fullname:
             raise ValueError("ФИО не может быть пустым")
-        if '@' not in self.email:
+        email_pattern = re.compile(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$')
+        if not email_pattern.match(self.email):
             raise ValueError("Некорректный email")
         try:
             parsed = phonenumbers.parse(self.phone, None)  # None = определить страну автоматически
