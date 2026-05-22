@@ -6,7 +6,8 @@ def client_orm_to_entity(orm:ClientORM)->ClientEntity:
         fullname=orm.fullname,
         phone=orm.phone,
         email=orm.email,
-        password=orm.password
+        password=orm.password,
+        id=orm.id
     )
 
 def client_entity_to_orm(entity:ClientEntity)->ClientORM:

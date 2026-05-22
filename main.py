@@ -1,7 +1,8 @@
 from contextlib import asynccontextmanager
+from dataclasses import asdict
 from datetime import datetime,date
 from typing import Dict
-
+from fastapi import Body
 from sqlalchemy import update
 import pathlib
 from apscheduler.schedulers.background import BackgroundScheduler
@@ -10,13 +11,15 @@ from sqlalchemy.orm import Session
 from database import SessionLocal
 import CURD
 import models
+from domain.entities.ClientUpdate import ClientUpdate
+from domain.repositories.sqlalchemy_agent_repo import SQLAlchemyAgentRepository
 from domain.repositories.sqlalchemy_application_repo import SQLAlchemyApplicationRepository
 from domain.repositories.sqlalchemy_client_repo import SQLAlchemyClientRepository
 from domain.repositories.sqlalchemy_contract_repo import SQLAlchemyContractRepository
 from domain.repositories.sqlalchemy_profile_repo import SQLAlchemyProfileRepository
+from domain.services.AgentService import AgentServise
+from domain.services.ClientService import ClientService
 from domain.services.ApplicationService import ApplicationServise
-
-from domain.services.ClientService import ClientServise
 from domain.services.ContractService import ContractService
 from domain.services.ProfileService import ProfileService
 
@@ -68,7 +71,7 @@ def test():
 @app.post("/client/")
 async def createClient(fullname:str,phone:str,email:str,password:str, db: Session = Depends(get_db)):
     repo=SQLAlchemyClientRepository(db)
-    service=ClientServise(repo)
+    service=ClientService(repo)
     result=await service.create_client(
         fullname=fullname,
         phone=phone,
@@ -89,10 +92,26 @@ async def createApplication(client_id:int, agent_id:int,insurance_type:str,  pro
 
     )
     return result
+@app.patch("/client/{client_id}")
+async def update_client(client_id: int,
+                        update_data: ClientUpdate = Body(...),
+                        db: Session = Depends(get_db)):
+    repo=SQLAlchemyClientRepository(db)
+    service=ClientService(repo)
+    updates = {k: v for k, v in asdict(update_data).items() if v is not None}
+    if not updates:
+        raise HTTPException(400, "No fields to update")
+    try:
+        updated = await service.update_client(client_id, updates)
+    except ValueError as e:
+        raise HTTPException(400, str(e))
+    return updated
 
-@app.get("/client/myApplications")
-def getAllUserApplication(id_client: int, db:Session=Depends(get_db)):
-    return CURD.getAllUserApplication(db,id_client)
+@app.get("/agent/allClients")
+async def getAllUsers(db:Session=Depends(get_db)):
+    repo=SQLAlchemyAgentRepository(db)
+    service=AgentServise(repo)
+    return service.get_all_clients()
 
 @app.post("/agent/contracts/")
 async def create_contract(
