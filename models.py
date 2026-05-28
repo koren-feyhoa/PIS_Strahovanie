@@ -26,7 +26,7 @@ class Agent(Base):
     id = Column(Integer, primary_key=True)
     fullname = Column(String)
     email = Column(String(50), unique=True)
-
+    password: Mapped[str]=mapped_column(String(50))
 class Profile(Base):
     __tablename__ = 'profile'
     id:Mapped[int] = mapped_column(primary_key=True, autoincrement=True)

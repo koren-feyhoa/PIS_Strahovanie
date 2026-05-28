@@ -7,6 +7,7 @@ class AgentEntity:
 
     fullname: str
     email: str
+    password:str
     id: Optional[int] = None
 
     def __post_init__(self):

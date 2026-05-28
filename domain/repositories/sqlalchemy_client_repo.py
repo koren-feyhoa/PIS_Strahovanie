@@ -1,3 +1,5 @@
+from typing import List
+
 from domain.entities.ClientEntity import ClientEntity
 from domain.repositories.client_repo import ClientRepository
 from sqlalchemy.orm import Session
@@ -32,3 +34,7 @@ class SQLAlchemyClientRepository(ClientRepository):
         self.db.commit()
         self.db.refresh(orm)
         return client_orm_to_entity(orm)
+
+    def get_all(self, skip: int = 0, limit: int = 100) -> List[ClientEntity]:
+        clients = self.db.query(ClientORM).offset(skip).limit(limit).all()
+        return [client_orm_to_entity(client) for client in clients]

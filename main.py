@@ -11,6 +11,8 @@ from sqlalchemy.orm import Session
 from database import SessionLocal
 import CURD
 import models
+from domain.entities.ApplicationEntity import ApplicationEntity
+from domain.entities.ApplicationUpdate import ApplicationUpdate
 from domain.entities.ClientUpdate import ClientUpdate
 from domain.repositories.sqlalchemy_agent_repo import SQLAlchemyAgentRepository
 from domain.repositories.sqlalchemy_application_repo import SQLAlchemyApplicationRepository
@@ -110,7 +112,8 @@ async def update_client(client_id: int,
 @app.get("/agent/allClients")
 async def getAllUsers(db:Session=Depends(get_db)):
     repo=SQLAlchemyAgentRepository(db)
-    service=AgentServise(repo)
+    repo_client=SQLAlchemyClientRepository(db)
+    service=AgentServise(repo_client,repo)
     return service.get_all_clients()
 
 @app.post("/agent/contracts/")
@@ -125,7 +128,8 @@ async def create_contract(
     file: UploadFile = File(...),
 ):
     repo=SQLAlchemyContractRepository(db)
-    service=ContractService(repo)
+    repo_app=SQLAlchemyApplicationRepository(db)
+    service=ContractService(repo,repo_app)
     result = await service.create_contract(
         client_id=client_id,
         application_id=application_id,
@@ -138,22 +142,8 @@ async def create_contract(
     return result
 
 
-@app.get("/contracts/contract")
-async def getContract(contract_id:int,client_id:int,db: Session = Depends(get_db)):
-    contract=CURD.getContractById(db,contract_id)
-    if contract.client_id != client_id:
-        raise HTTPException(403, "Access denied")
-    file_path=pathlib.Path(contract.file_path)/contract.file_name
-    if not file_path.exists():
-        raise HTTPException(404, "File not found on server")
-    return FileResponse(path=file_path,
-        filename=contract.file_name,   # имя, которое увидит пользователь
-        media_type="application/octet-stream" )
 
-@app.get("/client/contracts")
-async def getContractsByClient(client_id:int,db: Session = Depends(get_db)):
-    contracts=CURD.getContractsByClient(db,client_id)
-    return contracts
+
 
 @app.post("/client/application/profiles")
 async def createProfile(client_id:int,type_document:str,info:Dict[str,str],db: Session = Depends(get_db)):
@@ -162,9 +152,55 @@ async def createProfile(client_id:int,type_document:str,info:Dict[str,str],db: S
     result= await service.create_profile(client_id, type_document, info)
     return result
 
-@app.get("/client/application/see_info")
-async def getProfileById(id:int,db: Session = Depends(get_db)):
-    return CURD.readProdileById(db,id)
+
+@app.get("/agent")
+async def getAgentById(id:int,db: Session = Depends(get_db)):
+    repo=SQLAlchemyAgentRepository(db)
+    client_repo=SQLAlchemyClientRepository(db)
+    service=AgentServise(client_repo,repo)
+    result= service.get_by_id(id)
+    return result
+@app.get("/agent/allapp")
+async def getAllApplications(db:Session=Depends(get_db)):
+    repo=SQLAlchemyApplicationRepository(db)
+    service=ApplicationServise(repo)
+    result=await service.get_all_applications()
+    return result
+@app.get("/client/applications")
+async def clientApplication(client_id:int,db:Session=Depends(get_db)):
+    repo=SQLAlchemyApplicationRepository(db)
+    service=ApplicationServise(repo)
+    result=await service.get_applications_by_client(client_id)
+    return result
+
+@app.patch("/agent/applications/update")
+async def updateApplication(application_id:int,
+                            updates_data:ApplicationUpdate=Body(...),
+                            db:Session=Depends(get_db)):
+    repo=SQLAlchemyApplicationRepository(db)
+    service=ApplicationServise(repo)
+    updates = {k: v for k, v in asdict(updates_data).items() if v is not None}
+    if not updates:
+        raise HTTPException(400, "No fields to update")
+    try:
+        updated = await service.update_price_application(application_id, updates)
+    except ValueError as e:
+        raise HTTPException(400, str(e))
+    return updated
+
+@app.patch("/client/applications/{application_id}")
+async def rejectApplication(application_id:int, db:Session=Depends(get_db)):
+    repo=SQLAlchemyApplicationRepository(db)
+    service=ApplicationServise(repo)
+    result= await service.update_status_reject(application_id)
+    return result
+
+@app.patch("/client/applications/{application_id}/accept")
+async def acceptApplication(application_id:int, db:Session=Depends(get_db)):
+    repo=SQLAlchemyApplicationRepository(db)
+    service=ApplicationServise(repo)
+    result= await service.update_status_accept(application_id)
+    return result
 
 
 

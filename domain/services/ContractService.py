@@ -2,12 +2,15 @@
 from datetime import date, datetime
 
 from domain.entities.ContractEntity import ContractEntity
+from domain.repositories.appication_repo import ApplicationRepository
 from domain.repositories.contract_repo import ContractRepository
 from storage import FileStorage
 
 class ContractService:
-    def __init__(self, contract_repo: ContractRepository):
+    def __init__(self, contract_repo: ContractRepository, app_repo:ApplicationRepository):
         self.repo = contract_repo
+        self.app_repo= app_repo
+
 
     async def create_contract(
         self,
@@ -19,6 +22,11 @@ class ContractService:
         end_date: date,
         file_upload,
     ) -> ContractEntity:
+        application = self.app_repo.get_by_id(application_id)
+        if not application:
+            raise ValueError("Application not found")
+        if application.status_application != "Создание договора":
+            raise ValueError("Контракт можно создать только из заявки со статусом 'Создание договора'")
         folder_path, file_name = await FileStorage.save(file_upload, client_id)
         file_time = datetime.now()
 
@@ -34,7 +42,7 @@ class ContractService:
             file_time=file_time,
             status="Посмотреть"
         )
-
+        application.status_application = "Договор заключён"
+        self.app_repo.update(application)
         saved_contract = self.repo.add(contract_entity)
         return saved_contract
-    #Потом написать как-то код, что при заключении договора статус заявки меняется на "Договор заключен"
