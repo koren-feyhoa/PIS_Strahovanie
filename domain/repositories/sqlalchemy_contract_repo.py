@@ -2,7 +2,7 @@
 from sqlalchemy.orm import Session
 from .contract_repo  import ContractRepository
 from domain.entities.ContractEntity import ContractEntity
-from mappers.ContractMapper import contract_entity_to_orm
+from mappers.ContractMapper import contract_entity_to_orm, contract_orm_to_entity
 from models import Contract as ContractORM
 
 class SQLAlchemyContractRepository(ContractRepository):
@@ -16,3 +16,6 @@ class SQLAlchemyContractRepository(ContractRepository):
         self.db.refresh(db_contract)
         contract.id = db_contract.id
         return contract
+    def get_by_id(self, contract_id:int) ->ContractEntity:
+        orm=self.db.query(ContractORM)
+        return contract_orm_to_entity(orm)

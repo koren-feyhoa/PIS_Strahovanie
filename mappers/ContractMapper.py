@@ -13,7 +13,8 @@ def contract_orm_to_entity(orm: ContractORM) -> ContractEntity:
         file_name=orm.file_name,
         file_path=orm.file_path,
         file_time=orm.file_time,
-        status_contract=orm.status_contract
+        status_contract=orm.status_contract,
+        id=orm.id
     )
 
 def contract_entity_to_orm(entity: ContractEntity) -> ContractORM:

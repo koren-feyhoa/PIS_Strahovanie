@@ -40,3 +40,4 @@ class SQLAlchemyApplicationRepository(ApplicationRepository):
         self.db.commit()
         self.db.refresh(orm)
         return application_orm_to_entity(orm)
+

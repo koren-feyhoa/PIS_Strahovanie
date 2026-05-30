@@ -6,7 +6,8 @@ def profile_orm_to_entity(orm:ProfileORM)->ProfileEntity:
     return ProfileEntity(
         client_id=orm.client_id,
         type_document=orm.type_document,
-        info=DeserializaJSON(orm.info)
+        info=DeserializaJSON(orm.info),
+        id=orm.id
     )
 def profile_entity_to_orm(ent:ProfileEntity)-> ProfileORM:
     return ProfileORM(

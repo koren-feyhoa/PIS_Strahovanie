@@ -10,7 +10,7 @@ class ProfileEntity:
     info: Dict[str, Any]  # JSON-поле
     id: Optional[int] = None
 
-    def __post_init__(self):
+    def validate(self):
         if not self.type_document:
             raise ValueError("Тип документа не указан")
         if self.type_document not in ['Паспорт РФ', 'Водительские права', 'Машина', 'ВетПаспорт']:
@@ -20,5 +20,7 @@ class ProfileEntity:
 
     @classmethod
     def create(cls, client_id: int, type_document: str, info: Dict[str, Any]) -> "ProfileEntity":
-        return cls(client_id=client_id, type_document=type_document, info=info)
+        profile= cls(client_id=client_id, type_document=type_document, info=info)
+        profile.validate()
+        return profile
 

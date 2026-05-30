@@ -4,16 +4,16 @@ from datetime import datetime,date
 from typing import Dict
 from fastapi import Body
 from sqlalchemy import update
-import pathlib
 from apscheduler.schedulers.background import BackgroundScheduler
 from fastapi import FastAPI, HTTPException, Depends, UploadFile, File
 from sqlalchemy.orm import Session
 from database import SessionLocal
-import CURD
 import models
 from domain.entities.ApplicationEntity import ApplicationEntity
 from domain.entities.ApplicationUpdate import ApplicationUpdate
 from domain.entities.ClientUpdate import ClientUpdate
+from domain.entities.ProfileEntity import ProfileEntity
+from domain.entities.ProfileUpdate import ProfileUpdate
 from domain.repositories.sqlalchemy_agent_repo import SQLAlchemyAgentRepository
 from domain.repositories.sqlalchemy_application_repo import SQLAlchemyApplicationRepository
 from domain.repositories.sqlalchemy_client_repo import SQLAlchemyClientRepository
@@ -202,7 +202,27 @@ async def acceptApplication(application_id:int, db:Session=Depends(get_db)):
     result= await service.update_status_accept(application_id)
     return result
 
+@app.get("/client/account")
+async def get_all_profiles_by_client(client_id:int,db:Session=Depends(get_db)):
+    repo=SQLAlchemyProfileRepository(db)
+    service=ProfileService(repo)
+    result=await service.get_profiles_by_client_id(client_id)
+    return result
 
+# @app.patch("/client/account",response_model=ProfileEntity)
+# async def update_profile(profile_id:int,
+#                          updates_data:ProfileUpdate=Body(...),
+#                          db:Session=Depends(get_db))->ProfileEntity:
+#     repo=SQLAlchemyProfileRepository(db)
+#     service=ProfileService(repo)
+#     updates = {k: v for k, v in asdict(updates_data).items() if v is not None}
+#     try:
+#         updated = await service.update_profile_info(profile_id,updates)
+#     except ValueError as e:
+#         raise HTTPException(400, str(e))
+#     return updated
+
+#разобраться с профилями
 
 
 
