@@ -24,6 +24,7 @@ from domain.services.ClientService import ClientService
 from domain.services.ApplicationService import ApplicationServise
 from domain.services.ContractService import ContractService
 from domain.services.ProfileService import ProfileService
+from domain.services.ApplicationToContractService import ApplicationToContractService
 
 from fastapi.responses import FileResponse
 
@@ -129,7 +130,7 @@ async def create_contract(
 ):
     repo=SQLAlchemyContractRepository(db)
     repo_app=SQLAlchemyApplicationRepository(db)
-    service=ContractService(repo,repo_app)
+    service=ApplicationToContractService(repo,repo_app)
     result = await service.create_contract(
         client_id=client_id,
         application_id=application_id,
@@ -222,7 +223,29 @@ async def get_all_profiles_by_client(client_id:int,db:Session=Depends(get_db)):
 #         raise HTTPException(400, str(e))
 #     return updated
 
-#разобраться с профилями
+@app.get("/client/contracts")
+async def get_contracts_by_client(client_id:int,db:Session=Depends(get_db)):
+    repo=SQLAlchemyContractRepository(db)
+    service=ContractService(repo)
+    result=await service.get_contracts_by_client(client_id)
+    return result
+
+@app.get("/agent/contracts")
+async def get_all_contracts(db:Session=Depends(get_db)):
+    repo = SQLAlchemyContractRepository(db)
+    service = ContractService(repo)
+    result=await service.get_all_contracts()
+    return result
+
+@app.get("/agent/contracts/contract")
+async def get_contract(contract_id:int,db:Session=Depends(get_db)):
+    repo = SQLAlchemyContractRepository(db)
+    service = ContractService(repo)
+    try:
+        return await service.get_contract_by_id(contract_id)
+    except ValueError as e:
+        raise HTTPException(status_code=404, detail=str(e))
+
 
 
 

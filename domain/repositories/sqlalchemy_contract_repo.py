@@ -1,4 +1,6 @@
 # repositories/sqlalchemy_contract_repo.py
+from typing import List
+
 from sqlalchemy.orm import Session
 from .contract_repo  import ContractRepository
 from domain.entities.ContractEntity import ContractEntity
@@ -16,6 +18,16 @@ class SQLAlchemyContractRepository(ContractRepository):
         self.db.refresh(db_contract)
         contract.id = db_contract.id
         return contract
+
     def get_by_id(self, contract_id:int) ->ContractEntity:
-        orm=self.db.query(ContractORM)
-        return contract_orm_to_entity(orm)
+        orm=self.db.query(ContractORM).filter(ContractORM.id==contract_id).first()
+        return contract_orm_to_entity(orm) if orm else None
+
+    def get_by_client_id(self, client_id: int,skip: int = 0, limit: int = 100) -> List[ContractEntity]:
+        orm = self.db.query(ContractORM).filter(ContractORM.client_id == client_id).offset(skip).limit(
+            limit).all()
+        return [contract_orm_to_entity(contract) for contract in orm]
+
+    def get_all(self, skip: int = 0, limit: int = 100) -> List[ContractEntity]:
+        orm = self.db.query(ContractORM).offset(skip).limit(limit).all()
+        return [contract_orm_to_entity(contract) for contract in orm]
